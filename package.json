@@ -1,28 +1,18 @@
 {
-  "name": "electron-screen-ocr",
+  "name": "screen-ocr-web",
   "version": "1.0.0",
-  "description": "Electron app for screen capture and OCR",
-  "main": "dist/main.js",
+  "description": "Web app for screen capture and OCR",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:electron\"",
-    "dev:renderer": "vite",
-    "dev:electron": "npm run build:main && npm run build:preload && electron dist/main.js",
-    "build": "npm run build:renderer && npm run build:main && npm run build:preload",
-    "build:renderer": "vite build",
-    "build:main": "tsc src/main/main.ts --outDir dist --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
-    "build:preload": "tsc src/main/preload.ts --outDir dist --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
-    "start": "electron dist/main.js",
-    "pack": "electron-builder",
-    "dist": "electron-builder --publish=never"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --port 5000"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "concurrently": "^8.0.0",
-    "electron": "^27.0.0",
-    "electron-builder": "^24.0.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
   },
@@ -30,17 +20,6 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "tesseract.js": "^5.0.0"
-  },
-  "build": {
-    "appId": "com.example.electron-screen-ocr",
-    "productName": "Screen OCR",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "assets/**/*"
-    ]
   }
 } 
 

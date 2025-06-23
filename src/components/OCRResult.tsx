@@ -19,6 +19,7 @@ const OCRResult: React.FC<OCRResultProps> = ({ imageUrl, selectedArea, onOcrResu
   const [preprocessedImageUrl, setPreprocessedImageUrl] = useState<string | null>(null);
   const [ocrEngine, setOcrEngine] = useState<'tesseract' | 'google-vision'>('tesseract');
   const [googleVisionApiKey, setGoogleVisionApiKey] = useState('');
+  const [ocrResult, setOcrResult] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -270,10 +271,13 @@ const OCRResult: React.FC<OCRResultProps> = ({ imageUrl, selectedArea, onOcrResu
         result = text.trim();
       }
       
+      setOcrResult(result);
       onOcrResult(result, ocrEngine === 'google-vision' ? 'Google Vision AI' : 'Tesseract');
     } catch (error) {
       console.error('OCR Error:', error);
-      onOcrResult(`${ocrEngine === 'google-vision' ? 'Google Vision' : 'Tesseract'} 텍스트 인식 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = `${ocrEngine === 'google-vision' ? 'Google Vision' : 'Tesseract'} 텍스트 인식 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`;
+      setOcrResult(errorMessage);
+      onOcrResult(errorMessage);
     } finally {
       setIsProcessing(false);
       setProgress(0);
@@ -284,6 +288,26 @@ const OCRResult: React.FC<OCRResultProps> = ({ imageUrl, selectedArea, onOcrResu
     <div className="ocr-controls">
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       <canvas ref={previewCanvasRef} style={{ display: 'none' }} />
+      
+      {/* OCR 상태 메시지 */}
+      <div className="ocr-status-header">
+        {isProcessing ? (
+          <div className="status-processing">
+            <span className="status-icon">🔄</span>
+            <span className="status-text">텍스트 인식 중...</span>
+          </div>
+        ) : ocrResult ? (
+          <div className="status-ready">
+            <span className="status-icon">✅</span>
+            <span className="status-text">텍스트 인식 완료!</span>
+          </div>
+        ) : (
+          <div className="status-ready">
+            <span className="status-icon">📝</span>
+            <span className="status-text">설정을 조정한 후 "텍스트 인식 시작" 버튼을 눌러주세요</span>
+          </div>
+        )}
+      </div>
       
       {/* 전처리 상태 표시 */}
       {(preprocessImage || scaleFactor !== 1 || selectedArea) && (
@@ -437,6 +461,32 @@ const OCRResult: React.FC<OCRResultProps> = ({ imageUrl, selectedArea, onOcrResu
             ></div>
           </div>
           <span className="progress-text">{progress}%</span>
+        </div>
+      )}
+
+      {/* OCR 결과 표시 */}
+      {ocrResult && (
+        <div className="ocr-result-section">
+          <h4>📄 인식된 텍스트:</h4>
+          <div className="result-container">
+            <div className="result-text">
+              <pre>{ocrResult}</pre>
+            </div>
+            <div className="result-actions">
+              <button
+                onClick={() => navigator.clipboard.writeText(ocrResult)}
+                className="copy-button"
+              >
+                📋 클립보드에 복사
+              </button>
+              <button
+                onClick={() => setOcrResult('')}
+                className="clear-button"
+              >
+                🗑️ 결과 지우기
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
